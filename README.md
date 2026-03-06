@@ -1,4 +1,4 @@
-# CyberSecurity Lab
+# SOC / Threat-Intelligence / CTF Projects
 
 A personal cybersecurity portfolio documenting hands-on work across threat detection, malware analysis, and capture-the-flag competitions. Each section reflects practical skills developed through building and operating a home lab environment.
 
