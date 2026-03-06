@@ -24,7 +24,7 @@ The objective of the investigation is to reconstruct the attacker's activities, 
 
 ## PCAP Analysis
 
-### Q1. Identifying the Source of Reconnaissance Traffic
+### Q1. After flooding the IIS host with rapid-fire probes, the attacker reveals their origin. Which IP address generated this reconnaissance traffic?
 
 The first step in the investigation was to identify which host was responsible for the initial reconnaissance activity. Since reconnaissance often involves sending a large number of connection attempts, examining TCP conversations in the capture can help identify the most active communicating hosts.
 
@@ -42,7 +42,7 @@ This pattern is consistent with network scanning or reconnaissance activity, whe
 
 ---
 
-### Q2. Mapping the Enumeration Activity to MITRE ATT&CK
+### Q2. Zeroing in on a single open service to gain a foothold, the attacker carries out targeted enumeration. Which MITRE ATT&CK technique ID covers this activity?
 
 After identifying the attacker's IP address, the next step was to classify the activity observed in the network traffic.
 
@@ -56,7 +56,7 @@ This technique describes situations where an attacker scans or probes a target s
 
 ---
 
-### Q3. Identifying SMB Share Enumeration
+### Q3. While reviewing the SMB traffic, you observe two consecutive Tree Connect requests that expose the first shares the intruder probes on the IIS host. Which two full UNC paths are accessed?
 
 Once a potential target service was identified, the attacker began interacting with the system using the SMB protocol. SMB is commonly used in Windows environments for file and resource sharing.
 
@@ -78,7 +78,7 @@ The first is a regular shared folder, while `IPC$` is a special administrative s
 
 ---
 
-### Q4. Detecting the Malicious File Upload
+### Q4. Inside the share, the attacker plants a web-accessible payload that will grant remote code execution. What is the filename of the malicious file they uploaded, and what byte length is specified in the corresponding SMB2 Write Request?
 
 After accessing the SMB share, the attacker uploaded a file to the system. To identify this activity, I filtered the capture for SMB2 Write requests, which occur when data is written to a file on the server.
 
@@ -94,7 +94,7 @@ Among the results was a suspicious file upload involving an `.aspx` file. ASPX f
 
 ---
 
-### Q5. Identifying the Reverse Shell Port
+### Q5. The newly planted shell calls back to the attacker over an uncommon but firewall-friendly port. Which listening port did the attacker use for the reverse shell?
 
 Once the web shell was deployed, the attacker used it to establish a reverse shell connection back to their system. Reverse shells allow compromised systems to initiate outbound connections to an attacker-controlled host, often bypassing firewall restrictions.
 
@@ -112,7 +112,7 @@ By aggregating destination ports used in these communications, one port stood ou
 
 ## Memory Dump Analysis
 
-### Q6. Determining the Kernel Base Address
+### Q6. Your memory snapshot captures the system’s kernel in situ, providing vital context for the breach. What is the kernel base address in the dump?
 
 The next phase of the investigation involved analyzing the memory dump of the compromised server. Using Volatility3, the `windows.info` plugin was executed to gather system-level information from the memory image.
 
@@ -120,15 +120,13 @@ The next phase of the investigation involved analyzing the memory dump of the co
 vol -f memdump.mem windows.info
 ```
 
-This plugin reveals key details about the operating system, including the kernel base address, which is often required for deeper memory analysis.
-
 > **Answer:** `0xf80079213000`
 
 ---
 
-### Q7. Detecting Persistence Mechanisms
+### Q7. A trusted service launches an unfamiliar executable residing outside the usual IIS stack, signalling a persistence implant. What is the final full on-disk path of that executable, and which MITRE ATT&CK persistence technique ID corresponds to this behaviour?
 
-Attackers commonly establish persistence mechanisms to maintain access after the initial compromise. To identify suspicious processes and their parent-child relationships, I examined the process tree using the following Volatility plugin:
+To identify suspicious processes and their parent-child relationships, I examined the process tree using the following Volatility plugin:
 
 ```bash
 vol -f memdump.mem windows.pstree
@@ -142,7 +140,7 @@ Reviewing the process tree revealed a suspicious executable located within the *
 
 ---
 
-### Q8. Identifying the Process Handling the Reverse Shell
+### Q8. The reverse shell’s outbound traffic is handled by a built-in Windows process that also spawns the implanted executable. What is the name of this process, and what PID does it run under?
 
 To determine which process handled the outbound communication associated with the reverse shell, I examined active network connections present in memory.
 
@@ -160,7 +158,7 @@ The output revealed that the network connection associated with the attacker's I
 
 ## Malware Analysis
 
-### Q9. Identifying the Packer
+### Q9. Static inspection reveals the binary has been packed to hinder analysis. Which packer was used to obfuscate it?
 
 To perform initial static analysis on the recovered malware sample, I used **Detect It Easy (DIE)**. The tool indicated that the binary had been packed using a common executable packer that compresses binaries and can obscure the original code structure, making analysis more difficult.
 
@@ -168,7 +166,7 @@ To perform initial static analysis on the recovered malware sample, I used **Det
 
 ---
 
-### Q10. Identifying Command-and-Control Infrastructure
+### Q10. Threat-intel analysis shows the malware beaconing to its command-and-control host. Which fully qualified domain name (FQDN) does it contact?
 
 To identify potential command-and-control infrastructure used by the malware, I submitted the file hash to **VirusTotal**. Reviewing the **Relations** section revealed the domain the sample communicated with.
 
@@ -176,7 +174,7 @@ To identify potential command-and-control infrastructure used by the malware, I 
 
 ---
 
-### Q11. Identifying the Malware Family
+### Q11. Open-source intel associates that hash with a well-known commodity RAT. To which malware family does the sample belong?
 
 Further analysis of the VirusTotal report revealed that the malware sample had already been analyzed and classified by the security community.
 
