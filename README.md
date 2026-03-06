@@ -21,7 +21,7 @@ Detailed solutions to Capture the Flag challenges across network forensics, memo
 
 | Category | Tools |
 |---|---|
-| SIEM | Wazuh, Splunk |
+| SIEM | Wazuh |
 | Network Analysis | Wireshark, tshark |
 | Memory Forensics | Volatility 3 |
 | Malware Analysis | Detect It Easy, PEiD, VirusTotal|
